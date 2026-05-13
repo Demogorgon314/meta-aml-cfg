@@ -20,7 +20,7 @@ SRC_URI = " \
 CARGO_NETWORK_OFFLINE = "1"
 
 # Use explicit SRCREV to avoid AUTOREV network fetch
-SRCREV = "47d1cf27e99dbd1adfe98cc8ed792a80390c3226"
+SRCREV = "a87f3d675777f5a0f9f5b5eda49cc7f0c41b9abf"
 
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
@@ -94,6 +94,7 @@ RDEPENDS:${PN} = " \
     systemd \
     udev \
     libusb1 \
+    xz \
 "
 
 # The Amlogic 5.15 kernel builds USB gadget/configfs support into the kernel
