@@ -6,3 +6,7 @@ EXTRA_USERS_PARAMS = "usermod -p '\$6\$ZjHJv2dDBSOECMla\$yggyCuOgLMn0CchupaKf5zz
 
 # Cockpit web admin interface with plugins
 IMAGE_INSTALL:append = " cockpit cockpit-gst-manager"
+
+# Keep opkg and its package database in the target image so local IPK updates
+# can be installed directly on development boards.
+IMAGE_FEATURES += "package-management"
