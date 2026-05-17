@@ -11,6 +11,7 @@ SRC_URI = " \
     git://github.com/aml-streambox/One-KVM-StreamBox.git;protocol=https;branch=v0.6.2_dev \
     file://0001-cargo-use-rust-1.59-compatible-feature-names.patch \
     file://0002-axum-server-add-body-data-buf-bound.patch \
+    file://0003-one-kvm-sync-hdmi-rx-edid-from-video-config.patch \
     file://one-kvm.service \
     file://one-kvm-vendor.tar.gz \
     file://one-kvm-web-dist.tar.gz \
