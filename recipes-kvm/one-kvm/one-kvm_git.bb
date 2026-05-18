@@ -232,11 +232,17 @@ do_install:append() {
     # Create working directories
     install -d ${D}${localstatedir}/lib/one-kvm
     install -d ${D}${sysconfdir}/one-kvm
+    install -d ${D}${sysconfdir}/one-kvm/ventoy
 
     # Install default config if present
     if [ -f ${S}/config.toml ]; then
         install -m 0644 ${S}/config.toml ${D}${sysconfdir}/one-kvm/
     fi
+
+    # Install Ventoy boot resources used to initialize the virtual MSD drive.
+    install -m 0644 ${S}/libs/ventoy-img-rs/resources/boot.img ${D}${sysconfdir}/one-kvm/ventoy/
+    xz -dc ${S}/libs/ventoy-img-rs/resources/core.img.xz > ${D}${sysconfdir}/one-kvm/ventoy/core.img
+    xz -dc ${S}/libs/ventoy-img-rs/resources/ventoy.disk.img.xz > ${D}${sysconfdir}/one-kvm/ventoy/ventoy.disk.img
 
     # Install systemd service
     install -d ${D}${systemd_system_unitdir}
