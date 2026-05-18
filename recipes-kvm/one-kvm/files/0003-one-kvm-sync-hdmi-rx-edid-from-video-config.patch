@@ -1,9 +1,9 @@
 diff --git a/src/hdmi_rx_edid.rs b/src/hdmi_rx_edid.rs
 new file mode 100644
-index 0000000..eb083bc
+index 0000000..c52efd6
 --- /dev/null
 +++ b/src/hdmi_rx_edid.rs
-@@ -0,0 +1,396 @@
+@@ -0,0 +1,439 @@
 +//! HDMI RX EDID synchronization for StreamBox AML boards.
 +
 +use std::{io, process::Command};
@@ -14,6 +14,7 @@ index 0000000..eb083bc
 +const EDID_WITH_PORT_PATH: &str = "/sys/class/hdmirx/hdmirx0/edid_with_port";
 +const EDID_SELECT_PATH: &str = "/sys/class/hdmirx/hdmirx0/edid_select";
 +const HDMI_RX_DEBUG_PATH: &str = "/sys/class/hdmirx/hdmirx0/debug";
++const HDMI_EDID_TEMPLATE_DIRS: [&str; 2] = ["/vendor/etc/tvconfig/hdmi", "/etc/tvconfig/hdmi"];
 +
 +const EDID_BLOCK: usize = 128;
 +const EDID_SIZE: usize = 256;
@@ -75,8 +76,8 @@ index 0000000..eb083bc
 +        return Ok(());
 +    }
 +
-+    let edid = build_edid(mode);
 +    for port in 1..=HDMI_RX_PORTS {
++        let edid = build_edid_for_port(mode, port).await;
 +        let mut payload = Vec::with_capacity(1 + EDID_SIZE * 2);
 +        payload.push(port & 0x0f);
 +        payload.extend_from_slice(&edid);
@@ -92,6 +93,48 @@ index 0000000..eb083bc
 +        mode.width, mode.height, mode.fps
 +    );
 +    Ok(())
++}
++
++async fn build_edid_for_port(mode: EdidMode, port: u8) -> [u8; EDID_SIZE] {
++    if let Some(mut edid) = read_template_edid(port).await {
++        let timing = timing_for_mode(mode);
++        write_dtd(&mut edid[54..72], timing);
++        update_checksum(&mut edid[0..EDID_BLOCK]);
++        debug!(
++            "Using HDMI 2.0 template EDID for port {} with preferred mode {}x{}@{}",
++            port, mode.width, mode.height, mode.fps
++        );
++        return edid;
++    }
++
++    debug!(
++        "No HDMI 2.0 template EDID found for port {}, using generated fallback",
++        port
++    );
++    build_fallback_edid(mode)
++}
++
++async fn read_template_edid(port: u8) -> Option<[u8; EDID_SIZE]> {
++    for dir in HDMI_EDID_TEMPLATE_DIRS {
++        for name in [
++            format!("{dir}/port{port}_20.bin"),
++            format!("{dir}/port1_20.bin"),
++            format!("{dir}/port_20.bin"),
++        ] {
++            let Ok(data) = tokio::fs::read(&name).await else {
++                continue;
++            };
++            if data.len() < EDID_SIZE {
++                continue;
++            }
++
++            let mut edid = [0u8; EDID_SIZE];
++            edid.copy_from_slice(&data[..EDID_SIZE]);
++            return Some(edid);
++        }
++    }
++
++    None
 +}
 +
 +fn restart_streambox_tv() {
@@ -126,7 +169,7 @@ index 0000000..eb083bc
 +    Ok(())
 +}
 +
-+fn build_edid(mode: EdidMode) -> [u8; EDID_SIZE] {
++fn build_fallback_edid(mode: EdidMode) -> [u8; EDID_SIZE] {
 +    let timing = timing_for_mode(mode);
 +    let mut edid = [0u8; EDID_SIZE];
 +
@@ -386,14 +429,14 @@ index 0000000..eb083bc
 +
 +    #[test]
 +    fn generated_edid_blocks_have_valid_checksums() {
-+        let edid = build_edid(EdidMode::new(1920, 1080, 60));
++        let edid = build_fallback_edid(EdidMode::new(1920, 1080, 60));
 +        assert_eq!(edid[0..128].iter().fold(0u8, |a, b| a.wrapping_add(*b)), 0);
 +        assert_eq!(edid[128..256].iter().fold(0u8, |a, b| a.wrapping_add(*b)), 0);
 +    }
 +
 +    #[test]
 +    fn preferred_mode_is_written_to_base_dtd() {
-+        let edid = build_edid(EdidMode::new(2560, 1440, 60));
++        let edid = build_fallback_edid(EdidMode::new(2560, 1440, 60));
 +        assert_eq!(edid[56], 0x00);
 +        assert_eq!(edid[58] >> 4, 0x0a);
 +        assert_eq!(edid[59], 0xa0);
