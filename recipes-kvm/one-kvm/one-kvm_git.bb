@@ -19,7 +19,7 @@ SRC_URI = " \
 CARGO_NETWORK_OFFLINE = "1"
 
 # Use explicit SRCREV to avoid AUTOREV network fetch
-SRCREV = "909c21c300528cddeb6af0b744e9170d6ab01caf"
+SRCREV = "2eb7a8a9411f9bbf9579e14d1ddc276514fcacb1"
 
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
