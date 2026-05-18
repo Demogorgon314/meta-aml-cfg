@@ -110,7 +110,7 @@ RDEPENDS:${PN} = " \
 
 # systemd service
 SYSTEMD_SERVICE:${PN} = "one-kvm.service"
-SYSTEMD_AUTO_ENABLE = "disable"
+SYSTEMD_AUTO_ENABLE = "enable"
 
 # The binary name produced by cargo
 CARGO_BIN_NAME = "one-kvm"
