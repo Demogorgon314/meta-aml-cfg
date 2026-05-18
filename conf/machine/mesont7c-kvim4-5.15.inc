@@ -41,6 +41,7 @@ KERNEL_MODULE_AUTOLOAD += " snd-soc-aml_codec_tl1_acodec"
 
 DISTRO_FEATURES:append = " aml-libjpeg"
 DISTRO_FEATURES:append = " aml-libmultienc"
+DISTRO_FEATURES:append = " disable-audio-server"
 DISTRO_FEATURES:append = " aml-isp arm-isp "
 DISTRO_FEATURES:append = " amlogic-tv "
 DISTRO_FEATURES:append = " softap"
