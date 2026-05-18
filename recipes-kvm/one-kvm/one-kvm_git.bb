@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=016b6c2875cfaf9d87362055aae3f974"
 
 # Use the pushed One-KVM repository, pinned by SRCREV for reproducible builds.
 SRC_URI = " \
-    git://github.com/aml-streambox/One-KVM-StreamBox.git;protocol=https;branch=v0.6.2_dev \
+    git://github.com/Demogorgon314/One-KVM-StreamBox.git;protocol=https;branch=dev \
     file://0001-cargo-use-rust-1.59-compatible-feature-names.patch \
     file://0002-axum-server-add-body-data-buf-bound.patch \
     file://one-kvm.service \
@@ -20,7 +20,7 @@ SRC_URI = " \
 CARGO_NETWORK_OFFLINE = "1"
 
 # Use explicit SRCREV to avoid AUTOREV network fetch
-SRCREV = "47d1cf27e99dbd1adfe98cc8ed792a80390c3226"
+SRCREV = "4b8dfef62fda72ea7160d275c7c883e89e2d78a8"
 
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
