@@ -3,16 +3,15 @@ DESCRIPTION = "One-KVM is an open and lightweight IP-KVM solution written in Rus
 This StreamBox variant integrates with Amlogic vfmcap + libmultienc for hardware-accelerated \
 4K60 HDMI capture and H264/H265 encoding via the Wave521 VPU."
 HOMEPAGE = "https://github.com/mofeng-git/One-KVM"
-LICENSE = "GPL-2.0-or-later"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=016b6c2875cfaf9d87362055aae3f974"
+LICENSE = "GPL-3.0-only"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 # Use the pushed One-KVM repository, pinned by SRCREV for reproducible builds.
 SRC_URI = " \
-    git://github.com/Demogorgon314/One-KVM-StreamBox.git;protocol=https;branch=dev \
-    file://0001-cargo-use-rust-1.59-compatible-feature-names.patch \
-    file://0002-axum-server-add-body-data-buf-bound.patch \
+    git://github.com/Demogorgon314/One-KVM-StreamBox.git;protocol=https;branch=sync-upstream-main \
     file://one-kvm.service \
-    file://one-kvm-vendor.tar.gz \
+    file://one-kvm-vendor.tar.gz.part00 \
+    file://one-kvm-vendor.tar.gz.part01 \
     file://one-kvm-web-dist.tar.gz \
     file://libyuv_stub.c \
 "
@@ -20,7 +19,7 @@ SRC_URI = " \
 CARGO_NETWORK_OFFLINE = "1"
 
 # Use explicit SRCREV to avoid AUTOREV network fetch
-SRCREV = "4b8dfef62fda72ea7160d275c7c883e89e2d78a8"
+SRCREV = "569336a5d03820727b3592c7a741fbdebe324e8f"
 
 S = "${WORKDIR}/git"
 CARGO_SRC_DIR = ""
@@ -40,25 +39,32 @@ CARGO_TARGET_SUBDIR = "${ONE_KVM_RUST_TARGET}/${BUILD_DIR}"
 RUSTFLAGS = "${RUST_DEBUG_REMAP}"
 
 # Match the verified direct AML build: use the AML capture/encoder path and
-# skip the generic V4L2 default feature.
+# avoid compiling V4L2 code against the older vendor kernel headers.
 CARGO_BUILD_FLAGS:append = " --no-default-features --features aml,hwencode"
 
 python do_patch:prepend() {
     # Make vendored crates available before patching so recipe-local fixes can
     # be applied with normal BitBake patch handling.
+    import glob
     import os
     import shutil
+    import subprocess
 
+    workdir = d.getVar('WORKDIR')
     vendor_src = os.path.join(d.getVar('WORKDIR'), 'vendor')
     vendor_dst = os.path.join(d.getVar('S'), 'vendor')
+    if not os.path.isdir(vendor_src):
+        parts = sorted(glob.glob(os.path.join(workdir, 'one-kvm-vendor.tar.gz.part*')))
+        archive = os.path.join(workdir, 'one-kvm-vendor.tar.gz')
+        if parts:
+            with open(archive, 'wb') as out:
+                for part in parts:
+                    with open(part, 'rb') as src:
+                        shutil.copyfileobj(src, out)
+            subprocess.check_call(['tar', 'xzf', archive, '-C', workdir])
+
     if os.path.isdir(vendor_src) and not os.path.exists(vendor_dst):
         shutil.copytree(vendor_src, vendor_dst, symlinks=True)
-
-    axum_server_src = os.path.join(vendor_dst, 'axum-server')
-    axum_server_dst = os.path.join(d.getVar('S'), 'patched-crates', 'axum-server')
-    if os.path.isdir(axum_server_src) and not os.path.exists(axum_server_dst):
-        os.makedirs(os.path.dirname(axum_server_dst), exist_ok=True)
-        shutil.copytree(axum_server_src, axum_server_dst, symlinks=True)
 }
 
 # Native build dependencies
@@ -79,6 +85,7 @@ DEPENDS:append = " \
     libjpeg-turbo \
     alsa-lib \
     libopus \
+    udev \
 "
 
 # Runtime dependencies
