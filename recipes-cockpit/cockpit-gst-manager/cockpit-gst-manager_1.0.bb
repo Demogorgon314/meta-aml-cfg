@@ -12,7 +12,7 @@ S = "${WORKDIR}/git"
 inherit systemd
 
 SYSTEMD_SERVICE:${PN} = "gst-manager.service"
-SYSTEMD_AUTO_ENABLE = "enable"
+SYSTEMD_AUTO_ENABLE = "disable"
 
 RDEPENDS:${PN} = " \
     python3 \

@@ -3,7 +3,10 @@ DESCRIPTION = "A Cockpit plugin for managing system settings on Amlogic A311D2 (
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-SRC_URI = "git://github.com/aml-streambox/cockpit-streambox-settings.git;protocol=https;branch=main"
+SRC_URI = " \
+    git://github.com/aml-streambox/cockpit-streambox-settings.git;protocol=https;branch=main \
+    file://0001-default-active-application-one-kvm.patch \
+"
 
 SRCREV = "af7dded431e645e02e4bf23020698f6be7878c26"
 
