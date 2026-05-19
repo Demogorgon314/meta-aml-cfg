@@ -1,25 +1,5 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: StreamBox <streambox@example.com>
-Date: Tue, 19 May 2026 00:00:00 +0800
-Subject: [PATCH] default active application to One-KVM
-
----
- backend/applications.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/backend/applications.py b/backend/applications.py
-index 0000000..0000000 100644
 --- a/backend/applications.py
 +++ b/backend/applications.py
-@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
- class ApplicationManager:
-     """Manages the mutually exclusive Streambox application services."""
- 
+@@ -13 +13 @@
 -    DEFAULT_APPLICATION = "gst-manager"
 +    DEFAULT_APPLICATION = "one-kvm"
-     APPLICATIONS = {
-         "gst-manager": {
-             "name": "GStreamer Manager",
--- 
-2.39.2
-
