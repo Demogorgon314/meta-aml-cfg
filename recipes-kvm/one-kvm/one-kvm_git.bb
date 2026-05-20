@@ -9,7 +9,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 # Use the pushed One-KVM repository, pinned by SRCREV for reproducible builds.
 SRC_URI = " \
     git://github.com/Demogorgon314/One-KVM-StreamBox.git;protocol=https;branch=sync-upstream-main \
-    file://0003-one-kvm-sync-hdmi-rx-edid-from-video-config.patch \
     file://one-kvm.service \
     file://one-kvm-vendor.tar.gz.part00 \
     file://one-kvm-vendor.tar.gz.part01 \
